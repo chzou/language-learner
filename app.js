@@ -4,7 +4,6 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var index = require('./routes/index');
 var users = require('./routes/users');
 
@@ -18,8 +17,8 @@ app.set('view engine', 'html');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.raw());;
+//app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -33,6 +32,7 @@ app.use(function(req, res, next) {
   next(err);
 });
 
+
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
@@ -44,31 +44,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.post('/submitimage', function(req, res) {
-  console.log("asdf");
-  res.end();
-});
 
-
-// Imports the Google Cloud client library
-const Vision = require('@google-cloud/vision');
-// Your Google Cloud Platform project ID
-const projectId = 'language-learner';
-
-// Instantiates a client
-const visionClient = Vision({
-  projectId: projectId
-});
-
-// The name of the image file to annotate
-const fileName = './tempimg.jpg';
-
-// Performs label detection on the image file
-visionClient.detectLabels(fileName).then((results) => {
-    const labels = results[0];
-
-    console.log('Labels:');
-    labels.forEach((label) => console.log(label));
-});
 
 module.exports = app;

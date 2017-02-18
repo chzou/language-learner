@@ -1,12 +1,11 @@
 var express = require('express');
 var router = express.Router();
+var controller = require("./classifier.js")
+var app = express();
 
-/* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'ejs' });
 });
 
-router.post('/submitimage', function(req, res, next) {
-  console.log(res);
-});
+router.post('/submitimage', controller.data);
 module.exports = router;
