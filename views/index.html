@@ -8,29 +8,27 @@
     <meta content="Display Webcam Stream" name="title">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
     <script src="https://rawgit.com/danialfarid/ng-file-upload/master/dist/ng-file-upload-shim.js"></script>
-<script src="https://rawgit.com/danialfarid/ng-file-upload/master/dist/ng-file-upload.min.js"></script>
+    <script src="https://rawgit.com/danialfarid/ng-file-upload/master/dist/ng-file-upload.min.js"></script>
     <title>Display Webcam Stream</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 </head>
 
 <body>
     <div id="container" ng-app="myApp" ng-controller="myCtrl">
-        <canvas id="canvas" style="display:none;" width="300" height="300"></canvas>
+        <canvas id="canvas" style="display:none;" width="640" height="480"></canvas>
         <video autoplay="true" id="videoElement" width="640" height="480">
         </video>
-        
-            <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</input>
-        
+        <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</input>
     </div>
     <script>
     var video = document.querySelector("#videoElement");
     var canvas = document.querySelector("#canvas");
     var button = document.querySelector("#button");
-   
+
     var app = angular.module("myApp", ['ngFileUpload']);
-    app.controller("myCtrl", ['$scope', 'Upload', function($scope, Upload) {
+    app.controller("myCtrl", ['$scope', 'Upload', '$http', function($scope, Upload, $http) {
         $scope.Upload = Upload;
-        
+        $scope.$http = $http;
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 
         if (navigator.getUserMedia) {
@@ -40,17 +38,15 @@
         }
 
         $scope.handleSubmit = function() {
-            console.log("asdf");
-            canvas.getContext("2d").drawImage(video, 0, 0, 300, 300, 0, 0, 300, 300);
-            var img = canvas.toDataURL("image/png");
+             canvas.getContext("2d").drawImage(video, 0, 0, 640, 640, 0, 0, 480, 480);
+            var img = canvas.toDataURL("image/jpeg", .5);
+            $scope.$http.post('/submitimage', {foo:img}).success(function(res){console.log(res)});
+        
             
-            $scope.Upload.upload({
-                url: '/submitimage',
-                file: img,
-            }).progress(function(e) {}).then(function(data, status, headers, config) {
-                console.log('success');
-            });
 
+           
+
+          
         }
     }]);
 
