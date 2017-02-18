@@ -6,26 +6,8 @@
 <meta content="What this page is about." name="description">
 <meta content="Display Webcam Stream" name="title">
 <title>Display Webcam Stream</title>
-  
-<style>
-#container {
-    margin: 0px auto;
-    width: 500px;
-    height: 375px;
-    border: 10px #333 solid;
-}
-#videoElement {
-    width: 500px;
-    height: 375px;
-    background-color: #666;
-}
-#canvas {
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">  
 
-}
-#button {
-
-}
-</style>
 </head>
   
 <body>
@@ -33,7 +15,10 @@
     <canvas id="canvas" style="display:none;" width="300" height="300"></canvas>
     <video autoplay="true" id="videoElement"  width="640" height="480">
     </video>
-    <input id="button" type="button" disabled="true" value="Take Picture"></input>
+    
+    <form action="submitimage" method="post">
+    	<input id="button" type="submit" disabled="true" value="Take Picture"></input>
+    </form>
 </div>
 <script>
  var video = document.querySelector("#videoElement");

@@ -44,6 +44,12 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+app.post('/submitimage', function(req, res) {
+  console.log("asdf");
+  res.end();
+});
+
+
 // Imports the Google Cloud client library
 const Vision = require('@google-cloud/vision');
 // Your Google Cloud Platform project ID
