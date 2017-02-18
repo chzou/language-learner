@@ -24,11 +24,49 @@
     var video = document.querySelector("#videoElement");
     var canvas = document.querySelector("#canvas");
     var button = document.querySelector("#button");
-
+    var isValid = true;
     var app = angular.module("myApp", ['ngFileUpload']);
-    app.controller("myCtrl", ['$scope', 'Upload', '$http', function($scope, Upload, $http) {
+    app.controller("myCtrl", ['$scope', 'Upload', '$http', '$interval', function($scope, Upload, $http, $interval) {
         $scope.Upload = Upload;
         $scope.$http = $http;
+        $scope.dataURItoBlob = function(dataURI) {
+            // convert base64/URLEncoded data component to raw binary data held in a string
+            var byteString;
+            if (dataURI.split(',')[0].indexOf('base64') >= 0)
+                byteString = atob(dataURI.split(',')[1]);
+            else
+                byteString = unescape(dataURI.split(',')[1]);
+
+            // separate out the mime component
+            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+
+            // write the bytes of the string to a typed array
+            var ia = new Uint8Array(byteString.length);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+
+            return new Blob([ia], {
+                type: mimeString
+            });
+        }
+
+        $scope.$interval = $interval;
+
+        $scope.sendImage = $interval(function() {
+            canvas.getContext("2d").drawImage(video, 0, 0, 640, 640, 0, 0, 480, 480);
+            var img = canvas.toDataURL("image/jpeg", .5);
+            var blob = $scope.dataURItoBlob(dataURL);
+            $scope.$http.post('/submitimage', {
+                foo: blob
+            }).success(function(res) {
+                console.log(res.data);
+                if (res.data == "DONE") {
+                    isValid = false;
+                }
+            });
+        }, 2000)
+
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 
         if (navigator.getUserMedia) {
@@ -38,15 +76,19 @@
         }
 
         $scope.handleSubmit = function() {
-             canvas.getContext("2d").drawImage(video, 0, 0, 640, 640, 0, 0, 480, 480);
+            canvas.getContext("2d").drawImage(video, 0, 0, 640, 640, 0, 0, 480, 480);
             var img = canvas.toDataURL("image/jpeg", .5);
-            $scope.$http.post('/submitimage', {foo:img}).success(function(res){console.log(res)});
-        
-            
+            if (isValid) {
 
-           
-
-          
+                $scope.$http.post('/submitimage', {
+                    foo: img
+                }).success(function(res) {
+                    console.log(res.data);
+                    if (res.data == "DONE") {
+                        isValid = false;
+                    }
+                });
+            }
         }
     }]);
 

@@ -19,6 +19,7 @@ app.set('view engine', 'html');
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 var jsonparser = bodyParser.json();
+var nouns = ["bottle", "play", "phone", "laptop"];
 app.use(jsonparser);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -27,8 +28,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 app.post('/submitimage',urlencodedParser, function(req, res){
-	console.log(req.body);
-	res.end();
+
+	var rand = Math.random() * (100) 
+	console.log(rand);
+	if(rand > 80){
+		res.send({data: "DONE"});
+	}else{
+		res.send({data: "NOT DONE"});
+	}
 });
 
 // catch 404 and forward to error handler
