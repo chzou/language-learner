@@ -44,15 +44,20 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+// Imports the Google Cloud client library
 const Vision = require('@google-cloud/vision');
+// Your Google Cloud Platform project ID
 const projectId = 'language-learner';
 
+// Instantiates a client
 const visionClient = Vision({
   projectId: projectId
 });
 
+// The name of the image file to annotate
 const fileName = '../girl-playing-with-blocks.jpg';
 
+// Performs label detection on the image file
 visionClient.detectLabels(fileName)
   .then((results) => {
     const labels = results[0];
