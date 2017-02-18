@@ -44,4 +44,21 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+const Vision = require('@google-cloud/vision');
+const projectId = 'language-learner';
+
+const visionClient = Vision({
+  projectId: projectId
+});
+
+const fileName = '../girl-playing-with-blocks.jpg';
+
+visionClient.detectLabels(fileName)
+  .then((results) => {
+    const labels = results[0];
+
+    console.log('Labels:');
+    labels.forEach((label) => console.log(label));
+});
+
 module.exports = app;
