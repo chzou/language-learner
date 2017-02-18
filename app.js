@@ -55,11 +55,10 @@ const visionClient = Vision({
 });
 
 // The name of the image file to annotate
-const fileName = '../girl-playing-with-blocks.jpg';
+const fileName = './tempimg.jpg';
 
 // Performs label detection on the image file
-visionClient.detectLabels(fileName)
-  .then((results) => {
+visionClient.detectLabels(fileName).then((results) => {
     const labels = results[0];
 
     console.log('Labels:');

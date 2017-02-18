@@ -19,17 +19,26 @@
     height: 375px;
     background-color: #666;
 }
+#canvas {
+
+}
+#button {
+
+}
 </style>
 </head>
   
 <body>
 <div id="container">
+    <canvas id="canvas" style="display:none;" width="300" height="300"></canvas>
     <video autoplay="true" id="videoElement"  width="640" height="480">
-     
     </video>
+    <input id="button" type="button" disabled="true" value="Take Picture"></input>
 </div>
 <script>
  var video = document.querySelector("#videoElement");
+ var canvas = document.querySelector("#canvas");
+ var button = document.querySelector("#button");
  
 navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
  
@@ -39,6 +48,12 @@ if (navigator.getUserMedia) {
  
 function handleVideo(stream) {
     video.src = window.URL.createObjectURL(stream);
+    button.disabled = false;
+    button.onclick = function() {
+	canvas.getContext("2d").drawImage(video, 0, 0, 300, 300, 0, 0, 300, 300);
+	var img = canvas.toDataURL("image/png");
+	alert("done");
+    }
 }
  
 function videoError(e) {
