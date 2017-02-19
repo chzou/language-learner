@@ -35,6 +35,23 @@
     var audio = document.querySelector("#audio");
     var isValid = true;
     var app = angular.module("myApp", ['angularAudioRecorder']);
+
+    function blobToBase64Promise(blob) {
+        return new Promise(function(res, rej) {
+            var dataURI;
+
+            var reader = new FileReader();
+
+            reader.onload = function() {
+                // here you'll call what to do with the base64 string result
+                dataURI = this.result;
+                res(dataURI);
+            };
+
+            reader.readAsDataURL(blob);
+        });
+    }
+
     function b64toBlob(b64Data, contentType, sliceSize) {
         contentType = contentType || '';
         sliceSize = sliceSize || 512;
@@ -72,17 +89,24 @@
                 video: true
             }, handleVideo, videoError);
         }
-        
+
         $scope.saveAudio = function() {
-            setTimeout(function(){
-                var sound = URL.createObjectURL(new Blob([$scope.recordedInput], {type:"audio/wav"}));
-                console.log($scope.recordedInput);
-                $scope.$http.post('/submitaudio', {
-                    foo: sound
-                }).success(function(res) {
-                    console.log(res);
-                    if(!res.data) return;
+            setTimeout(function() {
+                var reader = new FileReader();
+
+                var sound = new Blob([$scope.recordedInput], {
+                    type: "audio/wav"
                 });
+                blobToBase64Promise(sound).then(function(data) {
+                    $scope.$http.post('/submitaudio', {
+                        foo: data
+                    }).success(function(res) {
+                        console.log(res);
+                        if (!res.data) return;
+                    });
+                })
+
+
             }, 1000);
         }
 
@@ -96,7 +120,7 @@
 
             $scope.$http.post('/submitimage', {
                 foo: img
-            }).success(function(res){
+            }).success(function(res) {
                 console.log(res.data);
                 var convert = b64toBlob(res.data, "audio/wav");
                 var url = URL.createObjectURL(convert);
@@ -104,7 +128,7 @@
                 audio.src = url;
                 audio.play();
             });
-            
+
         }
 
     }]);
@@ -116,7 +140,6 @@
     function videoError(e) {
         // do something
     }
-
     </script>
     <style type="text/css">
     ::-webkit-scrollbar {

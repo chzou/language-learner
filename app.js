@@ -21,8 +21,9 @@ app.set('view engine', 'html');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-var jsonparser = bodyParser.json();
+var jsonparser = bodyParser({limit: '50mb'});
 var nouns = ["bottle", "play", "phone", "laptop"];
+
 app.use(jsonparser);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -95,9 +96,8 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
 });
 
 app.post('/submitaudio', urlencodedParser, function(req, res) {
-    //var sound = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
-    var sound = req.body.foo;
-    console.log(sound);
+    var sound = req.body.foo.replace(/^data:audio\/wav;base64,/, "");
+    
     res.send("AUDIO DONE");
 });
 
