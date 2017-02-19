@@ -33,7 +33,7 @@ const visionClient = Vision({
     projectId: projectId
 });
 
-var ourObjects = ["cup", "drink", "apple"];
+var ourObjects = ["cup", "drink", "apple", "glass"];
 
 app.use('/', index);
 app.use('/users', users);
@@ -51,12 +51,15 @@ app.post('/submitimage',urlencodedParser, function(req, res){
     var opts = {verbose: true};
     visionClient.detectLabels(filePath, opts, function(err, labels, apiResponse) {
         if (err) {
-            console.log("asdf");
+            console.log("Error");
         } else {
-        	console.log("asdf1");
+        	console.log("Success");
+        	console.log(labels);
             labels.forEach((label) => {
             	if(ourObjects.indexOf(label.desc) >= 0){
-            		console.log(label);
+            		if(label.score > 70){
+            			res.send("DONE");
+            		}
             	}
             });
 
