@@ -38,22 +38,22 @@ app.use('/users', users);
 app.post('/submitimage',urlencodedParser, function(req, res){
     //var image = req.body.foo;
     var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
-    console.log(image);
     var filePath = __dirname + "/imagefile.jpeg";
     fs.writeFile(filePath, image, "base64", function(err) {
-        if (err)
-            console.log("Error writing the image");
-        else
-            console.log("File written");
+        if (err) {
+            // do nothing -- here to suppress warnings
+        } else {
+
+        }
     });
 
-    visionClient.detectLabels(filePath)
-        .then((results) => {
-            const labels = results[0];
-
-            console.log('Labels:');
+    visionClient.detectLabels(filePath, function(err, labels, apiResponse) {
+        if (err) {
+            // do nothing -- here to suppress warnings
+        } else {
             labels.forEach((label) => console.log(label));
-        });
+        }
+    });
 
 	/*var rand = Math.random() * (100)
 	console.log(rand);
