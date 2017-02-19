@@ -21,8 +21,9 @@ app.set('view engine', 'html');
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-var jsonparser = bodyParser.json();
+var jsonparser = bodyParser({limit: '50mb'});
 var nouns = ["bottle", "play", "phone", "laptop"];
+
 app.use(jsonparser);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -87,20 +88,17 @@ var speech_to_text = new SpeechToTextV1 ({
 });
 
 app.post('/submitaudio', urlencodedParser, function(req, res) {
-    //var sound = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
+    var sound = req.body.foo.replace(/^data:audio\/wav;base64,/, "");
     var filePath = __dirname + "/audiofile.wav";
     fs.writeFile(filePath, sound, "base64", function(err) {
         if (err) { } else { } // does nothing -- error suppression
     });
     
-    var sound = req.body.foo;
     console.log(sound);
-    
-    var file = 'question78.wav';
    
     var params = {
         model: 'en-US_NarrowbandModel',
-        audio: fs.createReadStream(file),
+        audio: fs.createReadStream(filePath),
         content_type: 'audio/wav',
         timestamps: true,
         word_alternatives_threshold: 0.9,
@@ -117,13 +115,12 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
                 for (var j = 0; j < result.length; j++) {
                     var output = result[j].transcript;
                     outputStr += output;
-                    //console.log(output);
                 }
             }
             console.log(outputStr);
         }
     });
-    
+
     res.send("AUDIO DONE");
 });
 
@@ -144,7 +141,5 @@ app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
-
-
 
 module.exports = app;
