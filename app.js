@@ -33,7 +33,7 @@ const visionClient = Vision({
     projectId: projectId
 });
 
-var ourObjects = ["cup", "drink", "apple", "glass"];
+var ourObjects = ["cup", "drink", "apple", "glass", "person"];
 
 app.use('/', index);
 app.use('/users', users);
@@ -48,24 +48,35 @@ app.post('/submitimage',urlencodedParser, function(req, res){
 
         }
     });
+    var i = 1;
     var opts = {verbose: true};
     visionClient.detectLabels(filePath, opts, function(err, labels, apiResponse) {
+    	console.log(apiResponse);
         if (err) {
+        	i+=1;
             console.log("Error");
+             console.log(i);
+            res.send({done: "NOT DONE"});   
         } else {
+        	i+=1;
         	console.log("Success");
-        	console.log(labels);
-            labels.forEach((label) => {
+        	
+            for(var label of labels){
+            	console.log(label);
             	if(ourObjects.indexOf(label.desc) >= 0){
             		if(label.score > 70){
-            			res.send("DONE");
+            			 console.log(i);
+            			res.send({done: "DONE"});
+            			break;
             		}
             	}
-            });
 
+            };
+             console.log(i);
+            res.send({done: "NOT DONE"})
         }
+
     });
-    res.end();
 	/*var rand = Math.random() * (100)
 	console.log(rand);
 	if(rand > 80){

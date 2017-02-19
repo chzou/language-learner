@@ -42,16 +42,13 @@
             //canvas.getContext("2d").drawImage(video, 0, 0, 640, 640, 0, 0, 480, 480);
             canvas.getContext("2d").drawImage(video, 0, 0, 640, 480);
             var img = canvas.toDataURL("image/jpeg", .5);
-            if (isValid) {
+           
                 $scope.$http.post('/submitimage', {
                     foo: img
                 }).success(function(res) {
-                    console.log(res.data);
-                    if (res.data == "DONE") {
-                        isValid = false;
-                    }
-                });
-            }
+                    console.log(res);
+                                    });
+            
         }
     }]);
 
