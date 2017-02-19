@@ -53,12 +53,10 @@ app.post('/submitimage',urlencodedParser, function(req, res){
     visionClient.detectLabels(filePath, opts, function(err, labels, apiResponse) {
     	console.log(apiResponse);
         if (err) {
-        	i+=1;
             console.log("Error");
-             console.log(i);
             res.send({done: "NOT DONE"});   
         } else {
-        	i+=1;
+        	
         	console.log("Success");
         	
             for(var label of labels){
@@ -70,10 +68,9 @@ app.post('/submitimage',urlencodedParser, function(req, res){
             			break;
             		}
             	}
-
             };
              console.log(i);
-            res.send({done: "NOT DONE"})
+           // res.send({done: "NOT DONE"})
         }
 
     });
