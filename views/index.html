@@ -6,7 +6,6 @@
     <meta content="Display Webcam Stream" name="title">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
     <script src="https://cdn.rawgit.com/logbon72/angular-recorder/28053efbd004bf8411fb718158fdc137c54750e5/dist/angular-audio-recorder.min.js"></script>
-
     <title>Display Webcam Stream</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 </head>
@@ -19,13 +18,15 @@
             <div ng-if="recorder.isAvailable">
                 <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording">Start Record</button>
                 <button ng-click="recorder.stopRecord()" type="button" ng-disabled="!recorder.status.isRecording">Stop Record</button>
-                <button ng-click="console.log(recordedInput)" type="button" ng-disabled="recorder.status.isRecording || !recorder.audioModel">Download</button>
+                <button ng-click="recorder.playbackRecording()" type="button" ng-disabled="recorder.status.isRecording || !recorder.audioModel">
+                    Play Back
+                </button>
             </div>
             <div class="alert alert-danger" ng-if="!recorder.isAvailable">
-               THERE IS A PROBLEM HERE 
+                THERE IS A PROBLEM HERE
             </div>
         </div>
-        <audio id ="audio"></audio>
+        <audio id="audio"></audio>
     </div>
     <script>
     var video = document.querySelector("#videoElement");
@@ -35,33 +36,36 @@
     var isValid = true;
     var app = angular.module("myApp", ['angularAudioRecorder']);
     function b64toBlob(b64Data, contentType, sliceSize) {
-  contentType = contentType || '';
-  sliceSize = sliceSize || 512;
+        contentType = contentType || '';
+        sliceSize = sliceSize || 512;
 
-  var byteCharacters = atob(b64Data);
-  var byteArrays = [];
+        var byteCharacters = atob(b64Data);
+        var byteArrays = [];
 
-  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-    var slice = byteCharacters.slice(offset, offset + sliceSize);
+        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            var slice = byteCharacters.slice(offset, offset + sliceSize);
 
-    var byteNumbers = new Array(slice.length);
-    for (var i = 0; i < slice.length; i++) {
-      byteNumbers[i] = slice.charCodeAt(i);
+            var byteNumbers = new Array(slice.length);
+            for (var i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+
+            var byteArray = new Uint8Array(byteNumbers);
+
+            byteArrays.push(byteArray);
+        }
+
+        var blob = new Blob(byteArrays, {
+            type: contentType
+        });
+        return blob;
     }
 
-    var byteArray = new Uint8Array(byteNumbers);
-
-    byteArrays.push(byteArray);
-  }
-
-  var blob = new Blob(byteArrays, {type: contentType});
-  return blob;
-}
-    app.controller("myCtrl", ['$scope', '$http', '$interval', function($scope, $http, $interval) {
+    app.controller("myCtrl", ['$scope', '$http', '$interval', function($scope, $http, $interval, recorder) {
         var context = new AudioContext();
         $scope.$http = $http;
         $scope.$interval = $interval;
-        recordedInput = null;
+       // / $scope.recordedInput = Object.create({});
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 
         if (navigator.getUserMedia) {
@@ -69,11 +73,18 @@
                 video: true
             }, handleVideo, videoError);
         }
+        
+        $scope.saveAudio = function() {
+            setTimeout(function(){
+                $scope.$http.post('/submitaudio', {
+                foo: $scope.recordedInput
+            }).success(function(res) {
+                console.log(res);
+                if(!res.data) return;
+             
+            });
 
-        function saveAudio(){
-            alert("asf");
-            console.log('asdf');
-            console.log($scope.recordedInput);
+            }, 500);
         }
 
         $interval(function() {
@@ -108,11 +119,11 @@
     }
 
     </script>
-<style type="text/css">
-::-webkit-scrollbar {
-    display: none;
-}
-</style>
+    <style type="text/css">
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    </style>
 </body>
 
 </html>
