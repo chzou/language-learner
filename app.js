@@ -70,6 +70,7 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
                         var fname = '';
                         py.stdout.on('data', function(data) {
                           console.log("I MADE IT!");
+                          data = data.toString().replace(/(\r\n|\n|\r)/gm,"");
                             fs.readFile(__dirname + '/' + data, "base64", function(err, datum) {
 
                                 if (err) console.log(err);
