@@ -73,7 +73,7 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
                             fs.readFile(__dirname + '/' + data, "base64", function(err, datum) {
 
                                 if (err) console.log(err);
-                                else fname += data
+                                else fname += datum
                             });
                         });
                         py.stdout.on('end', function() {
