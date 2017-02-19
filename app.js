@@ -63,7 +63,7 @@ app.post('/submitimage',urlencodedParser, function(req, res){
             	console.log(label);
             	if(ourObjects.indexOf(label.desc) >= 0){
             		if(label.score > 70){
-            			fs.writeFile("/flag.txt", label.desc, "utf-8", function(err){});
+            			fs.writeFile(__dirname + "/flag.txt", label.desc, function(err){});
             			res.send({done: "DONE"});
             			break;
             		}
