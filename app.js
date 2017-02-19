@@ -11,7 +11,8 @@ var player = require('play-sound')(opts = {});
 var fs = require('fs');
 var recordAudio = require("record-audio");
 var app = express();
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
+var SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
     // view engine setup
     //app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
@@ -34,19 +35,16 @@ const visionClient = Vision({
     projectId: projectId
 });
 
-var ourObjects = ["cup", "drink", "apple", "glass", "person"];
+var speech_to_text = new SpeechToTextV1 ({
+  username: '{username}',
+  password: '{password}'
+});
 
 app.use('/', index);
 app.use('/users', users);
 app.post('/submitimage', urlencodedParser, function(req, res) {
-    /*fs.readFile(__dirname + '/' + "question36.wav", function(err, datum) {
-
-                                if (err) console.log(err);
-                                else res.send({data: datum.toString("base64")});
-                            });*/
-    //var image = req.body.foo;
    var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
-    var filePath = __dirname + "/imagefile.jpeg";
+   var filePath = __dirname + "/imagefile.jpeg";
     fs.writeFile(filePath, image, "base64", function(err) {
         if (err) {
             // do nothing -- here to suppress warnings
@@ -69,7 +67,6 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
 
             for (var label of labels) {
                 console.log(label);
-                //if (ourObjects.indexOf(label.desc) >= 0) {
                     if (label.score > 60) {
                         var spawn = require('child_process').spawn,
                             py = spawn('python', ['question.py', label.desc]);
@@ -89,7 +86,6 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
                         });
                         break;
                     }
-                //}
             };
 
         }
@@ -99,7 +95,10 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
 });
 
 app.post('/submitaudio', urlencodedParser, function(req, res) {
-    var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
+    //var sound = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
+    var sound = req.body.foo;
+    console.log(sound);
+    res.send("AUDIO DONE");
 });
 
 // catch 404 and forward to error handler
