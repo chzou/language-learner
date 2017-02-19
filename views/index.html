@@ -16,14 +16,41 @@
         <canvas id="canvas" style="display:none;" width="480" height="320"></canvas>
         <video autoplay="true" id="videoElement" width="100%" height="100%"></video>
         <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</input>
+        <audio id ="audio"></audio>
     </div>
     <script>
     var video = document.querySelector("#videoElement");
     var canvas = document.querySelector("#canvas");
     var button = document.querySelector("#button");
+    var audio = document.querySelector("#audio");
     var isValid = true;
     var app = angular.module("myApp", ['ngFileUpload']);
+    function b64toBlob(b64Data, contentType, sliceSize) {
+  contentType = contentType || '';
+  sliceSize = sliceSize || 512;
+
+  var byteCharacters = atob(b64Data);
+  var byteArrays = [];
+
+  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+    var byteNumbers = new Array(slice.length);
+    for (var i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    var byteArray = new Uint8Array(byteNumbers);
+
+    byteArrays.push(byteArray);
+  }
+
+  var blob = new Blob(byteArrays, {type: contentType});
+  return blob;
+}
     app.controller("myCtrl", ['$scope', 'Upload', '$http', '$interval', function($scope, Upload, $http, $interval) {
+        var context = new AudioContext();
+
         $scope.Upload = Upload;
         $scope.$http = $http;
         $scope.$interval = $interval;
@@ -42,7 +69,13 @@
             $scope.$http.post('/submitimage', {
                 foo: img
             }).success(function(res) {
-                console.log(res);
+                console.log(res.data);
+                var convert = b64toBlob(res.data, "audio/wav");
+                var url = URL.createObjectURL(convert);
+                console.log(url);
+                console.log(audio);
+                audio.src = url;
+                audio.play();
             });
 
         }

@@ -38,8 +38,13 @@ var ourObjects = ["cup", "drink", "apple", "glass", "person"];
 app.use('/', index);
 app.use('/users', users);
 app.post('/submitimage', urlencodedParser, function(req, res) {
+    /*fs.readFile(__dirname + '/' + "question36.wav", function(err, datum) {
+
+                                if (err) console.log(err);
+                                else res.send({data: datum.toString("base64")});
+                            });*/
     //var image = req.body.foo;
-    var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
+   var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
     var filePath = __dirname + "/imagefile.jpeg";
     fs.writeFile(filePath, image, "base64", function(err) {
         if (err) {
@@ -50,7 +55,7 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
     });
     var i = 1;
     var opts = { verbose: true };
-
+    
     visionClient.detectLabels(filePath, opts, function(err, labels, apiResponse) {
         console.log(apiResponse);
         if (err) {
@@ -68,17 +73,21 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
                         var spawn = require('child_process').spawn,
                             py = spawn('python', ['question.py', label.desc]);
                         var fname = '';
+
                         py.stdout.on('data', function(data) {
                           console.log("I MADE IT!");
-                          data = data.toString().replace(/(\r\n|\n|\r)/gm,"");
-                            fs.readFile(__dirname + '/' + data, "base64", function(err, datum) {
-
-                                if (err) console.log(err);
-                                else fname += datum
-                            });
+                          
+                           fname+=data;
                         });
                         py.stdout.on('end', function() {
-                            res.send({ data: fname });
+                            fname = fname.toString().replace(/(\r\n|\n|\r)/gm,"");
+                            
+                             fs.readFile(__dirname + '/' + fname, function(err, datum) {
+
+                                if (err) console.log(err);
+                                else  res.send({ data: datum.toString("base64") });
+                            });
+                           
 
                         });
                         break;
