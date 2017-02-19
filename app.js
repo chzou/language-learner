@@ -141,15 +141,17 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
                         console.log(fname);
                         if (err) console.log(err);
                         else res.send({ data: datum.toString("base64") });
+                        flag = 0;
                     } else {
                       console.log("nothing");
+                      flag = 0;
+                      res.send("NOT DONE");
                     }
                 });
             });
         }
     });
 
-    flag = 0;
 });
 
 // catch 404 and forward to error handler
