@@ -13,7 +13,7 @@ if (__name__ == '__main__'):
     numf.close()
 
     FNULL = open(os.devnull, 'w')
-    #subprocess.call(['rm','question'+str(fnum-1)+'.wav'])
+    subprocess.call(['rm','question'+str(fnum-1)+'.wav'])
 
     numf = open('questionnum.txt','w')
     numf.write(str(fnum+1))
