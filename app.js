@@ -9,11 +9,13 @@ var users = require('./routes/users');
 var submit = require('./routes/imagesubmit');
 var player = require('play-sound')(opts = {});
 var fs = require('fs');
+var wav = require('wav');
+var Speaker = require('speaker');
 
 var app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
-// view engine setup
-//app.set('views', path.join(__dirname, 'views'));
+    // view engine setup
+    //app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
@@ -38,8 +40,8 @@ var ourObjects = ["cup", "drink", "apple", "glass", "person"];
 
 app.use('/', index);
 app.use('/users', users);
-app.post('/submitimage',urlencodedParser, function(req, res){
-	//var image = req.body.foo;
+app.post('/submitimage', urlencodedParser, function(req, res) {
+    //var image = req.body.foo;
     var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
     var filePath = __dirname + "/imagefile.jpeg";
     fs.writeFile(filePath, image, "base64", function(err) {
@@ -50,64 +52,69 @@ app.post('/submitimage',urlencodedParser, function(req, res){
         }
     });
     var i = 1;
-    var opts = {verbose: true};
+    var opts = { verbose: true };
+
     visionClient.detectLabels(filePath, opts, function(err, labels, apiResponse) {
-    	console.log(apiResponse);
+        console.log(apiResponse);
         if (err) {
             console.log(err.name);
             console.log(JSON.stringify(err.errors, null, 2));
-            res.send({done: "NOT DONE"});   
+            res.send({ done: "NOT DONE" });
         } else {
-        	
-        	console.log("Success");
-        	
-            for(var label of labels){
-            	console.log(label);
-            	if(ourObjects.indexOf(label.desc) >= 0){
-            		if(label.score > 70){
-                  var spawn = require('child_process').spawn,
-                  py = spawn('python',['question.py',label.desc]);
-                  py.stdout.on('data', function(data){
-                    player.play(__dirname+'/'+data, function(err){
-                      if (err) throw err
-                    });
-                  });
-            			res.send({done: "DONE"});
-            			break;
-            		}
-            	}
+
+            console.log("Success");
+
+            for (var label of labels) {
+                console.log(label);
+                if (ourObjects.indexOf(label.desc) >= 0) {
+                    if (label.score > 70) {
+                        var spawn = require('child_process').spawn,
+                        py = spawn('python',['question.py',label.desc]);
+                        // py.stdout.on('data', function(data){
+                        //   console.log(data);
+                        //   var file = fs.createReadStream(data);
+                        //   var reader = new wav.Reader();
+                        //   reader.on('format', function (format) {
+                        //     reader.pipe(new Speaker(format));
+                        //   });
+                        //   file.pipe(reader);
+                        // });
+                        res.send({ done: "DONE" });
+                        break;
+                    }
+                }
             };
-             
+
         }
 
     });
-	/*var rand = Math.random() * (100)
-	console.log(rand);
-	if(rand > 80){
-		res.send({data: "DONE"});
-	}else{
-		res.send({data: "NOT DONE"});
-	}*/
+    /*var rand = Math.random() * (100)
+    console.log(rand);
+    if(rand > 80){
+      res.send({data: "DONE"});
+    }else{
+      res.send({data: "NOT DONE"});
+    }*/
 
-   
+
 });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error');
 });
 
 
