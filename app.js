@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser')
 var index = require('./routes/index');
 var users = require('./routes/users');
-var submit = require('./routes/imagesubmit')
+var submit = require('./routes/imagesubmit');
 
 var app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
@@ -25,17 +25,34 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const Vision = require('@google-cloud/vision');
+const projectId = 'language-learner';
+
+const visionClient = Vision({
+    projectId: projectId
+});
+
 app.use('/', index);
 app.use('/users', users);
 app.post('/submitimage',urlencodedParser, function(req, res){
+    //var image = req.body.foo;
+    var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
+    console.log(image);
+    var filePath = __dirname + "/imagefile.jpeg";
+    fs.writeFile(filePath, image, "base64", function(err) {
+        if (err)
+            console.log("Error writing the image");
+        else
+            console.log("File written");
+    });
 
-	var rand = Math.random() * (100) 
+	/*var rand = Math.random() * (100)
 	console.log(rand);
 	if(rand > 80){
 		res.send({data: "DONE"});
 	}else{
 		res.send({data: "NOT DONE"});
-	}
+	}*/
 });
 
 // catch 404 and forward to error handler

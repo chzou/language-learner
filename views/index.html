@@ -53,10 +53,10 @@
 
         $scope.$interval = $interval;
 
-        $scope.sendImage = $interval(function() {
+/*        $scope.sendImage = $interval(function() {
             canvas.getContext("2d").drawImage(video, 0, 0, 640, 640, 0, 0, 480, 480);
             var img = canvas.toDataURL("image/jpeg", .5);
-            var blob = $scope.dataURItoBlob(dataURL);
+            var blob = $scope.dataURItoBlob(img);
             $scope.$http.post('/submitimage', {
                 foo: blob
             }).success(function(res) {
@@ -66,6 +66,7 @@
                 }
             });
         }, 2000)
+        */
 
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 
