@@ -7,6 +7,7 @@ var bodyParser = require('body-parser')
 var index = require('./routes/index');
 var users = require('./routes/users');
 var submit = require('./routes/imagesubmit');
+var player = require('play-sound')(opts = {});
 var fs = require('fs');
 
 var app = express();
@@ -38,7 +39,7 @@ var ourObjects = ["cup", "drink", "apple", "glass", "person"];
 app.use('/', index);
 app.use('/users', users);
 app.post('/submitimage',urlencodedParser, function(req, res){
-    //var image = req.body.foo;
+	//var image = req.body.foo;
     var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
     var filePath = __dirname + "/imagefile.jpeg";
     fs.writeFile(filePath, image, "base64", function(err) {
@@ -63,7 +64,10 @@ app.post('/submitimage',urlencodedParser, function(req, res){
             	console.log(label);
             	if(ourObjects.indexOf(label.desc) >= 0){
             		if(label.score > 70){
-            			fs.writeFile(__dirname + "/flag.txt", label.desc, function(err){});
+            			player.play(__dirname+'/sample.mp3', function(err){
+  							if (err) throw err
+						});
+
             			res.send({done: "DONE"});
             			break;
             		}
