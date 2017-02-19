@@ -13,15 +13,15 @@ var recordAudio = require("record-audio");
 var app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 var SpeechToTextV1 = require('watson-developer-cloud/speech-to-text/v1');
-    // view engine setup
-    //app.set('views', path.join(__dirname, 'views'));
+// view engine setup
+//app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
-var jsonparser = bodyParser({limit: '50mb'});
+var jsonparser = bodyParser({ limit: '50mb' });
 var nouns = ["bottle", "play", "phone", "laptop"];
 
 app.use(jsonparser);
@@ -42,11 +42,11 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
     var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
     var filePath = __dirname + "/imagefile.jpeg";
     fs.writeFile(filePath, image, "base64", function(err) {
-        if (err) { } else { } // does nothing -- error suppression
+        if (err) {} else {} // does nothing -- error suppression
     });
     var i = 1;
     var opts = { verbose: true };
-    
+
     visionClient.detectLabels(filePath, opts, function(err, labels, apiResponse) {
         console.log(apiResponse);
         if (err) {
@@ -63,14 +63,14 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
 
                     py.stdout.on('data', function(data) {
                         console.log("I MADE IT!");
-                        fname+=data;
+                        fname += data;
                     });
                     py.stdout.on('end', function() {
-                        fname = fname.toString().replace(/(\r\n|\n|\r)/gm,"");
+                        fname = fname.toString().replace(/(\r\n|\n|\r)/gm, "");
                         fs.readFile(__dirname + '/' + fname, function(err, datum) {
-                             console.log(fname);
+                            console.log(fname);
                             if (err) console.log(err);
-                            else  res.send({ data: datum.toString("base64") });
+                            else res.send({ data: datum.toString("base64") });
                         });
                     });
                     break;
@@ -82,7 +82,7 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
 
 });
 
-var speech_to_text = new SpeechToTextV1 ({
+var speech_to_text = new SpeechToTextV1({
     username: '9ac80cd3-4dca-4044-95ff-b858d1846656',
     password: 'Mo8rpn3lPAb6'
 });
@@ -91,9 +91,9 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
     var sound = req.body.foo.replace(/^data:audio\/wav;base64,/, "");
     var filePath = __dirname + "/audiofile.wav";
     fs.writeFile(filePath, sound, "base64", function(err) {
-        if (err) { } else { } // does nothing -- error suppression
+        if (err) {} else {} // does nothing -- error suppression
     });
-    
+
     var params = {
         model: 'en-US_NarrowbandModel',
         audio: fs.createReadStream(filePath),
@@ -120,20 +120,23 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
             console.log(outputStr);
 
             var spawn = require('child_process').spawn,
-            py = spawn('python', ['conversation.py', outputStr]);
+                py = spawn('python', ['conversation.py', outputStr]);
             var fname = '';
 
             py.stdout.on('data', function(data) {
                 console.log("I MADE IT!");
-                fname+=data;
+                fname += data;
             });
             py.stdout.on('end', function() {
-                fname = fname.toString().replace(/(\r\n|\n|\r)/gm,"");
+                fname = fname.toString().replace(/(\r\n|\n|\r)/gm, "");
                 fs.readFile(__dirname + '/' + fname, function(err, datum) {
-                     console.log(fname);
-                     console.log(datum.toString("base64"));
-                    if (err) console.log(err);
-                    else  res.send({ data: datum.toString("base64") });
+                    if (datum) {
+                        console.log(fname);
+                        if (err) console.log(err);
+                        else res.send({ data: datum.toString("base64") });
+                    } else {
+                      console.log("nothing");
+                    }
                 });
             });
         }
