@@ -113,6 +113,7 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
         if (error) {
             console.log(error.name);
             console.log(JSON.stringify(error.errors, null, 2));
+            flag = 0;
             res.send({ done: "NOT DONE" });
         } else {
             var outputStr = "";
