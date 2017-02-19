@@ -33,6 +33,8 @@ const visionClient = Vision({
     projectId: projectId
 });
 
+var ourObjects = ["cup", "drink", "apple"];
+
 app.use('/', index);
 app.use('/users', users);
 app.post('/submitimage',urlencodedParser, function(req, res){
@@ -46,15 +48,21 @@ app.post('/submitimage',urlencodedParser, function(req, res){
 
         }
     });
-
-    visionClient.detectLabels(filePath, function(err, labels, apiResponse) {
+    var opts = {verbose: true};
+    visionClient.detectLabels(filePath, opts, function(err, labels, apiResponse) {
         if (err) {
-            // do nothing -- here to suppress warnings
+            console.log("asdf");
         } else {
-            labels.forEach((label) => console.log(label));
+        	console.log("asdf1");
+            labels.forEach((label) => {
+            	if(ourObjects.indexOf(label.desc) >= 0){
+            		console.log(label);
+            	}
+            });
+
         }
     });
-
+    res.end();
 	/*var rand = Math.random() * (100)
 	console.log(rand);
 	if(rand > 80){
@@ -63,7 +71,7 @@ app.post('/submitimage',urlencodedParser, function(req, res){
 		res.send({data: "NOT DONE"});
 	}*/
 
-    res.end();
+   
 });
 
 // catch 404 and forward to error handler
