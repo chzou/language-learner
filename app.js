@@ -7,6 +7,7 @@ var bodyParser = require('body-parser')
 var index = require('./routes/index');
 var users = require('./routes/users');
 var submit = require('./routes/imagesubmit');
+var fs = require('fs');
 
 var app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
@@ -46,6 +47,14 @@ app.post('/submitimage',urlencodedParser, function(req, res){
             console.log("File written");
     });
 
+    visionClient.detectLabels(filePath)
+        .then((results) => {
+            const labels = results[0];
+
+            console.log('Labels:');
+            labels.forEach((label) => console.log(label));
+        });
+
 	/*var rand = Math.random() * (100)
 	console.log(rand);
 	if(rand > 80){
@@ -53,6 +62,8 @@ app.post('/submitimage',urlencodedParser, function(req, res){
 	}else{
 		res.send({data: "NOT DONE"});
 	}*/
+
+    res.end();
 });
 
 // catch 404 and forward to error handler
