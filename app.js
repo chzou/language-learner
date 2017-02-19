@@ -35,22 +35,13 @@ const visionClient = Vision({
     projectId: projectId
 });
 
-var speech_to_text = new SpeechToTextV1 ({
-  username: '{username}',
-  password: '{password}'
-});
-
 app.use('/', index);
 app.use('/users', users);
 app.post('/submitimage', urlencodedParser, function(req, res) {
-   var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
-   var filePath = __dirname + "/imagefile.jpeg";
+    var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
+    var filePath = __dirname + "/imagefile.jpeg";
     fs.writeFile(filePath, image, "base64", function(err) {
-        if (err) {
-            // do nothing -- here to suppress warnings
-        } else {
-
-        }
+        if (err) { } else { } // does nothing -- error suppression
     });
     var i = 1;
     var opts = { verbose: true };
@@ -62,42 +53,77 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
             console.log(JSON.stringify(err.errors, null, 2));
             res.send({ done: "NOT DONE" });
         } else {
-
-            console.log("Success");
-
             for (var label of labels) {
                 console.log(label);
-                    if (label.score > 60) {
-                        var spawn = require('child_process').spawn,
-                            py = spawn('python', ['question.py', label.desc]);
-                        var fname = '';
+                if (label.score > 60) {
+                    var spawn = require('child_process').spawn,
+                        py = spawn('python', ['question.py', label.desc]);
+                    var fname = '';
 
-                        py.stdout.on('data', function(data) {
-                          console.log("I MADE IT!");
-                           fname+=data;
+                    py.stdout.on('data', function(data) {
+                        console.log("I MADE IT!");
+                        fname+=data;
+                    });
+                    py.stdout.on('end', function() {
+                        fname = fname.toString().replace(/(\r\n|\n|\r)/gm,"");
+                        fs.readFile(__dirname + '/' + fname, function(err, datum) {
+                             console.log(fname);
+                            if (err) console.log(err);
+                            else  res.send({ data: datum.toString("base64") });
                         });
-                        py.stdout.on('end', function() {
-                            fname = fname.toString().replace(/(\r\n|\n|\r)/gm,"");
-                             fs.readFile(__dirname + '/' + fname, function(err, datum) {
-                                 console.log(fname);
-                                if (err) console.log(err);
-                                else  res.send({ data: datum.toString("base64") });
-                            });
-                        });
-                        break;
-                    }
-            };
-
+                    });
+                    break;
+                }
+            }
         }
 
     });
 
 });
 
+var speech_to_text = new SpeechToTextV1 ({
+    username: '9ac80cd3-4dca-4044-95ff-b858d1846656',
+    password: 'Mo8rpn3lPAb6'
+});
+
 app.post('/submitaudio', urlencodedParser, function(req, res) {
     //var sound = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
+    var filePath = __dirname + "/audiofile.wav";
+    fs.writeFile(filePath, sound, "base64", function(err) {
+        if (err) { } else { } // does nothing -- error suppression
+    });
+    
     var sound = req.body.foo;
     console.log(sound);
+    
+    var file = 'question78.wav';
+   
+    var params = {
+        model: 'en-US_NarrowbandModel',
+        audio: fs.createReadStream(file),
+        content_type: 'audio/wav',
+        timestamps: true,
+        word_alternatives_threshold: 0.9,
+        continuous: true
+    };
+
+    speech_to_text.recognize(params, function(error, transcript) {
+        if (error) {
+            console.log('Error:', error);
+        } else {
+            var outputStr = "";
+            for (var i = 0; i < transcript.results.length; i++) {
+                var result = transcript.results[i].alternatives;
+                for (var j = 0; j < result.length; j++) {
+                    var output = result[j].transcript;
+                    outputStr += output;
+                    //console.log(output);
+                }
+            }
+            console.log(outputStr);
+        }
+    });
+    
     res.send("AUDIO DONE");
 });
 
