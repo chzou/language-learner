@@ -20,25 +20,52 @@
             <div ng-if="recorder.isAvailable">
                 <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording">Start Record</button>
                 <button ng-click="recorder.stopRecord()" type="button" ng-disabled="!recorder.status.isRecording">Stop Record</button>
-                <button ng-click="recorder.save()" type="button" ng-disabled="recorder.status.isRecording || !recorder.audioModel">Download</button>
+                <button ng-click="console.log(recordedInput)" type="button" ng-disabled="recorder.status.isRecording || !recorder.audioModel">Download</button
             </div>
             <div class="alert alert-danger" ng-if="!recorder.isAvailable">
                THERE IS A PROBLEM HERE 
             </div>
         </div>
+        <audio id ="audio"></audio>
     </div>
     <script>
     var video = document.querySelector("#videoElement");
     var canvas = document.querySelector("#canvas");
     var button = document.querySelector("#button");
+    var audio = document.querySelector("#audio");
     var isValid = true;
     var app = angular.module("myApp", ['angularAudioRecorder'])
         .config(['recorderServiceProvider', function(recorderServiceProvider){
             
         }]);
+    function b64toBlob(b64Data, contentType, sliceSize) {
+  contentType = contentType || '';
+  sliceSize = sliceSize || 512;
+
+  var byteCharacters = atob(b64Data);
+  var byteArrays = [];
+
+  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    var slice = byteCharacters.slice(offset, offset + sliceSize);
+
+    var byteNumbers = new Array(slice.length);
+    for (var i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+
+    var byteArray = new Uint8Array(byteNumbers);
+
+    byteArrays.push(byteArray);
+  }
+
+  var blob = new Blob(byteArrays, {type: contentType});
+  return blob;
+}
     app.controller("myCtrl", ['$scope', '$http', '$interval', function($scope, $http, $interval) {
+        var context = new AudioContext();
         $scope.$http = $http;
         $scope.$interval = $interval;
+        recordedInput = null;
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 
         if (navigator.getUserMedia) {
@@ -46,7 +73,11 @@
                 video: true
             }, handleVideo, videoError);
         }
-
+        function saveAudio(){
+            alert("asf");
+            console.log('asdf');
+            console.log($scope.recordedInput);
+        }
         $scope.handleSubmit = function() {
             canvas.getContext("2d").drawImage(video, 0, 0, 480, 320);
             var img = canvas.toDataURL("image/jpeg", .9);
@@ -54,7 +85,13 @@
             $scope.$http.post('/submitimage', {
                 foo: img
             }).success(function(res) {
-                console.log(res);
+                console.log(res.data);
+                var convert = b64toBlob(res.data, "audio/wav");
+                var url = URL.createObjectURL(convert);
+                console.log(url);
+                console.log(audio);
+                audio.src = url;
+                audio.play();
             });
 
         }
