@@ -9,9 +9,6 @@ var users = require('./routes/users');
 var submit = require('./routes/imagesubmit');
 var player = require('play-sound')(opts = {});
 var fs = require('fs');
-var wav = require('wav');
-var Speaker = require('speaker');
-
 var app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
     // view engine setup
@@ -69,17 +66,20 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
                 if (ourObjects.indexOf(label.desc) >= 0) {
                     if (label.score > 70) {
                         var spawn = require('child_process').spawn,
-                        py = spawn('python',['question.py',label.desc]);
-                        // py.stdout.on('data', function(data){
-                        //   console.log(data);
-                        //   var file = fs.createReadStream(data);
-                        //   var reader = new wav.Reader();
-                        //   reader.on('format', function (format) {
-                        //     reader.pipe(new Speaker(format));
-                        //   });
-                        //   file.pipe(reader);
-                        // });
-                        res.send({ done: "DONE" });
+                            py = spawn('python', ['question.py', label.desc]);
+                        var fname = '';
+                        py.stdout.on('data', function(data) {
+                          console.log("I MADE IT!");
+                            fs.readFile(__dirname + '/' + data, "base64", function(err, datum) {
+
+                                if (err) console.log(err);
+                                else fname += data
+                            });
+                        });
+                        py.stdout.on('end', function() {
+                            res.send({ data: fname });
+
+                        });
                         break;
                     }
                 }
