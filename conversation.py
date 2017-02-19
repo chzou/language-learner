@@ -3,6 +3,7 @@ import json
 import subprocess
 from watson_developer_cloud import ConversationV1
 import os
+import sys
 
 if (__name__ == '__main__'):
     conversation = ConversationV1(
@@ -16,7 +17,9 @@ if (__name__ == '__main__'):
 
     workspace_id = 'b0906674-2c80-4064-8927-e879df1b68a8'
 
-    inp = 'I am drinking water.'
+    #inp = 'I am drinking water.'
+
+    inp = sys.argv[1]
 
     response = conversation.message(
       workspace_id=workspace_id,

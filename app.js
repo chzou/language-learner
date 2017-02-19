@@ -94,8 +94,6 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
         if (err) { } else { } // does nothing -- error suppression
     });
     
-    console.log(sound);
-   
     var params = {
         model: 'en-US_NarrowbandModel',
         audio: fs.createReadStream(filePath),
@@ -107,7 +105,9 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
 
     speech_to_text.recognize(params, function(error, transcript) {
         if (error) {
-            console.log('Error:', error);
+            console.log(error.name);
+            console.log(JSON.stringify(error.errors, null, 2));
+            res.send({ done: "NOT DONE" });
         } else {
             var outputStr = "";
             for (var i = 0; i < transcript.results.length; i++) {
@@ -118,10 +118,28 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
                 }
             }
             console.log(outputStr);
+
+            var spawn = require('child_process').spawn,
+            py = spawn('python', ['conversation.py', outputStr]);
+            var fname = '';
+
+            py.stdout.on('data', function(data) {
+                console.log("I MADE IT!");
+                fname+=data;
+            });
+            py.stdout.on('end', function() {
+                fname = fname.toString().replace(/(\r\n|\n|\r)/gm,"");
+                fs.readFile(__dirname + '/' + fname, function(err, datum) {
+                     console.log(fname);
+                     console.log(datum.toString("base64"));
+                    if (err) console.log(err);
+                    else  res.send({ data: datum.toString("base64") });
+                });
+            });
         }
     });
 
-    res.send("AUDIO DONE");
+    //res.send("AUDIO DONE");
 });
 
 // catch 404 and forward to error handler

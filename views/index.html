@@ -101,8 +101,11 @@
                     $scope.$http.post('/submitaudio', {
                         foo: data
                     }).success(function(res) {
-                        console.log(res);
-                        if (!res.data) return;
+                        var convert = b64toBlob(res.data, "audio/wav");
+                        var url = URL.createObjectURL(convert);
+                        console.log(url);
+                        audio.src = url;
+                        audio.play();
                     });
                 })
 
