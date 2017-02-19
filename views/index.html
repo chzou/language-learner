@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta content="stuff, to, help, search, engines, not" name="keywords">
@@ -13,13 +14,11 @@
 </head>
 
 <body>
-
     <div id="container" ng-app="myApp" ng-controller="myCtrl">
         <canvas id="canvas" style="display:none;" width="640" height="480"></canvas>
         <video autoplay="true" id="videoElement" width="640" height="480"></video>
         <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</input>
     </div>
-
     <script>
     var video = document.querySelector("#videoElement");
     var canvas = document.querySelector("#canvas");
@@ -42,13 +41,13 @@
             //canvas.getContext("2d").drawImage(video, 0, 0, 640, 640, 0, 0, 480, 480);
             canvas.getContext("2d").drawImage(video, 0, 0, 640, 480);
             var img = canvas.toDataURL("image/jpeg", .5);
-           
-                $scope.$http.post('/submitimage', {
-                    foo: img
-                }).success(function(res) {
-                    console.log(res);
-                                    });
-            
+
+            $scope.$http.post('/submitimage', {
+                foo: img
+            }).success(function(res) {
+                console.log(res);
+            });
+
         }
     }]);
 
@@ -59,8 +58,7 @@
     function videoError(e) {
         // do something
     }
-
     </script>
-
 </body>
+
 </html>

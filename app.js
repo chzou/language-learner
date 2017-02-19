@@ -63,14 +63,13 @@ app.post('/submitimage',urlencodedParser, function(req, res){
             	console.log(label);
             	if(ourObjects.indexOf(label.desc) >= 0){
             		if(label.score > 70){
-            			 console.log(i);
+            			fs.writeFile("/flag.txt", label.desc, "utf-8", function(err){});
             			res.send({done: "DONE"});
             			break;
             		}
             	}
             };
-             console.log(i);
-           // res.send({done: "NOT DONE"})
+             
         }
 
     });
