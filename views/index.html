@@ -18,9 +18,6 @@
             <div ng-if="recorder.isAvailable">
                 <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording">Start Record</button>
                 <button ng-click="recorder.stopRecord()" type="button" ng-disabled="!recorder.status.isRecording">Stop Record</button>
-                <button ng-click="recorder.playbackRecording()" type="button" ng-disabled="recorder.status.isRecording || !recorder.audioModel">
-                    Play Back
-                </button>
             </div>
             <div class="alert alert-danger" ng-if="!recorder.isAvailable">
                 THERE IS A PROBLEM HERE
@@ -39,15 +36,12 @@
     function blobToBase64Promise(blob) {
         return new Promise(function(res, rej) {
             var dataURI;
-
             var reader = new FileReader();
-
             reader.onload = function() {
                 // here you'll call what to do with the base64 string result
                 dataURI = this.result;
                 res(dataURI);
             };
-
             reader.readAsDataURL(blob);
         });
     }
@@ -68,7 +62,6 @@
             }
 
             var byteArray = new Uint8Array(byteNumbers);
-
             byteArrays.push(byteArray);
         }
 
@@ -93,7 +86,6 @@
         $scope.saveAudio = function() {
             setTimeout(function() {
                 var reader = new FileReader();
-
                 var sound = new Blob([$scope.recordedInput], {
                     type: "audio/wav"
                 });
@@ -105,14 +97,12 @@
                         if (!res.data) return;
                     });
                 })
-
-
             }, 1000);
         }
 
         $interval(function() {
             $scope.handleSubmit();
-        }, 300000);
+        }, 3000);
 
         $scope.handleSubmit = function() {
             canvas.getContext("2d").drawImage(video, 0, 0, 480, 320);
