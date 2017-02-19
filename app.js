@@ -65,10 +65,13 @@ app.post('/submitimage',urlencodedParser, function(req, res){
             	console.log(label);
             	if(ourObjects.indexOf(label.desc) >= 0){
             		if(label.score > 70){
-            			player.play(__dirname+'/sample.mp3', function(err){
-  							if (err) throw err
-						});
-
+                  var spawn = require('child_process').spawn,
+                  py = spawn('python',['question.py',label.desc]);
+                  py.stdout.on('data', function(data){
+                    player.play(__dirname+'/'+data, function(err){
+                      if (err) throw err
+                    });
+                  });
             			res.send({done: "DONE"});
             			break;
             		}
