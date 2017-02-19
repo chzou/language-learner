@@ -16,8 +16,8 @@
         <video autoplay="true" id="videoElement" width="100%" height="100%"></video>
         <div ng-audio-recorder id='audioInput' audio-model='recordedInput' on-record-complete="saveAudio()">
             <div ng-if="recorder.isAvailable">
-                <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording">Start Record</button>
-                <button ng-click="recorder.stopRecord()" type="button" ng-disabled="!recorder.status.isRecording">Stop Record</button>
+                <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording" style='display: none;' id="start">Start Record</button>
+                <button ng-click="recorder.stopRecord()" type="button" ng-disabled="!recorder.status.isRecording" style='display: none;' id="stop">Stop Record</button>
             </div>
             <div class="alert alert-danger" ng-if="!recorder.isAvailable">
                 THERE IS A PROBLEM HERE
@@ -71,10 +71,12 @@
         return blob;
     }
 
-    app.controller("myCtrl", ['$scope', '$http', '$interval', function($scope, $http, $interval, recorder) {
+    app.controller("myCtrl", ['$scope', '$http', '$interval', '$document', function($scope, $http, $interval, recorder, $document) {
         var context = new AudioContext();
         $scope.$http = $http;
         $scope.$interval = $interval;
+        $scope.startButton;
+        $scope.stopButton;
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
 
         if (navigator.getUserMedia) {
@@ -82,8 +84,15 @@
                 video: true
             }, handleVideo, videoError);
         }
+        window.onload = function() {
+            var startButton = document.getElementById("start");
+            var stopButton = document.getElementById("stop");
+            $scope.startButton = startButton;
+            $scope.stopButton = stopButton;
+        }
 
         $scope.saveAudio = function() {
+            console.log("asdf");
             setTimeout(function() {
                 var reader = new FileReader();
                 var sound = new Blob([$scope.recordedInput], {
@@ -95,7 +104,7 @@
                     }).success(function(res) {
                         var convert = b64toBlob(res.data, "audio/wav");
                         var url = URL.createObjectURL(convert);
-                        console.log(url);
+                        //console.log(url);
                         audio.src = url;
                         audio.play();
                     });
@@ -105,24 +114,33 @@
 
         $interval(function() {
             $scope.handleSubmit();
-        }, 3000);
+        }, 5000);
 
         $scope.handleSubmit = function() {
-            canvas.getContext("2d").drawImage(video, 0, 0, 480, 320);
-            var img = canvas.toDataURL("image/jpeg", .9);
+            if (isValid) {
+                canvas.getContext("2d").drawImage(video, 0, 0, 480, 320);
+                var img = canvas.toDataURL("image/jpeg", .9);
 
-            $scope.$http.post('/submitimage', {
-                foo: img
-            }).success(function(res) {
-                console.log(res.data);
-                var convert = b64toBlob(res.data, "audio/wav");
-                var url = URL.createObjectURL(convert);
-                console.log(url);
-                audio.src = url;
-                audio.play();
-            });
+                $scope.$http.post('/submitimage', {
+                    foo: img
+                }).success(function(res) {
+                        console.log(res.data);
+                        var convert = b64toBlob(res.data, "audio/wav");
+                        var url = URL.createObjectURL(convert);
+                        console.log(url);
+                        audio.src = url;
+                        audio.play();
+                        setTimeout(function() {
+                                $scope.startButton.click();
+                                setTimeout(function() {
+                                    $scope.stopButton.click();
+                                    isValid = false;
+                                }, 5000)}, 1500
+                        );
 
+                });
         }
+    }
 
     }]);
 

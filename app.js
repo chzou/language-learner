@@ -126,8 +126,10 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
             py.stdout.on('data', function(data) {
                 console.log("I MADE IT!");
                 fname += data;
+                
             });
             py.stdout.on('end', function() {
+                console.log(fname);
                 fname = fname.toString().replace(/(\r\n|\n|\r)/gm, "");
                 fs.readFile(__dirname + '/' + fname, function(err, datum) {
                     if (datum) {
