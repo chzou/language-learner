@@ -15,8 +15,6 @@
     <div id="container" ng-app="myApp" ng-controller="myCtrl">
         <canvas id="canvas" style="display:none;" width="480" height="320"></canvas>
         <video autoplay="true" id="videoElement" width="100%" height="100%"></video>
-<!--        <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</button>
--->
         <div ng-audio-recorder id='audioInput' audio-model='recordedInput'>
             <div ng-if="recorder.isAvailable">
                 <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording">Start Record</button>
@@ -35,10 +33,7 @@
     var button = document.querySelector("#button");
     var audio = document.querySelector("#audio");
     var isValid = true;
-    var app = angular.module("myApp", ['angularAudioRecorder'])
-        .config(['recorderServiceProvider', function(recorderServiceProvider){
-            
-        }]);
+    var app = angular.module("myApp", ['angularAudioRecorder']);
     function b64toBlob(b64Data, contentType, sliceSize) {
   contentType = contentType || '';
   sliceSize = sliceSize || 512;
@@ -74,6 +69,7 @@
                 video: true
             }, handleVideo, videoError);
         }
+
         function saveAudio(){
             alert("asf");
             console.log('asdf');
@@ -90,15 +86,15 @@
 
             $scope.$http.post('/submitimage', {
                 foo: img
-            }).success(function(res) {
+            }).success(function(res){
                 console.log(res.data);
                 var convert = b64toBlob(res.data, "audio/wav");
                 var url = URL.createObjectURL(convert);
                 console.log(url);
-                console.log(audio);
                 audio.src = url;
                 audio.play();
             });
+            
         }
 
     }]);

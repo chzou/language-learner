@@ -69,7 +69,7 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
 
             for (var label of labels) {
                 console.log(label);
-                if (ourObjects.indexOf(label.desc) >= 0) {
+                //if (ourObjects.indexOf(label.desc) >= 0) {
                     if (label.score > 60) {
                         var spawn = require('child_process').spawn,
                             py = spawn('python', ['question.py', label.desc]);
@@ -89,7 +89,7 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
                         });
                         break;
                     }
-                }
+                //}
             };
 
         }
