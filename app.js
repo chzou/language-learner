@@ -54,7 +54,8 @@ app.post('/submitimage',urlencodedParser, function(req, res){
     visionClient.detectLabels(filePath, opts, function(err, labels, apiResponse) {
     	console.log(apiResponse);
         if (err) {
-            console.log("Error");
+            console.log(err.name);
+            console.log(JSON.stringify(err.errors, null, 2));
             res.send({done: "NOT DONE"});   
         } else {
         	
