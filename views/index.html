@@ -115,7 +115,6 @@
         $interval(function() {
             $scope.handleSubmit();
         }, 5000);
-
         $scope.handleSubmit = function() {
             if (isValid) {
                 canvas.getContext("2d").drawImage(video, 0, 0, 480, 320);

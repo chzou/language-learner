@@ -36,9 +36,15 @@ const visionClient = Vision({
     projectId: projectId
 });
 
+var flag = 0; // zero: can submit image; one: cannot submit image
+
 app.use('/', index);
 app.use('/users', users);
 app.post('/submitimage', urlencodedParser, function(req, res) {
+    if (flag == 1) {
+        res.end();
+        return;
+    }
     var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
     var filePath = __dirname + "/imagefile.jpeg";
     fs.writeFile(filePath, image, "base64", function(err) {
@@ -57,12 +63,12 @@ app.post('/submitimage', urlencodedParser, function(req, res) {
             for (var label of labels) {
                 console.log(label);
                 if (label.score > 60) {
+                    flag = 1;
                     var spawn = require('child_process').spawn,
                         py = spawn('python', ['question.py', label.desc]);
                     var fname = '';
 
                     py.stdout.on('data', function(data) {
-                        console.log("I MADE IT!");
                         fname += data;
                     });
                     py.stdout.on('end', function() {
@@ -124,7 +130,6 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
             var fname = '';
 
             py.stdout.on('data', function(data) {
-                console.log("I MADE IT!");
                 fname += data;
                 
             });
@@ -144,7 +149,7 @@ app.post('/submitaudio', urlencodedParser, function(req, res) {
         }
     });
 
-    //res.send("AUDIO DONE");
+    flag = 0;
 });
 
 // catch 404 and forward to error handler
