@@ -5,8 +5,8 @@
     <meta charset="utf-8">
     <meta content="Display Webcam Stream" name="title">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-    <script src="https://rawgit.com/danialfarid/ng-file-upload/master/dist/ng-file-upload-shim.js"></script>
-    <script src="https://rawgit.com/danialfarid/ng-file-upload/master/dist/ng-file-upload.min.js"></script>
+    <script src="https://cdn.rawgit.com/logbon72/angular-recorder/28053efbd004bf8411fb718158fdc137c54750e5/dist/angular-audio-recorder.min.js"></script>
+
     <title>Display Webcam Stream</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 </head>
@@ -15,16 +15,28 @@
     <div id="container" ng-app="myApp" ng-controller="myCtrl">
         <canvas id="canvas" style="display:none;" width="480" height="320"></canvas>
         <video autoplay="true" id="videoElement" width="100%" height="100%"></video>
-        <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</input>
+        <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</button>
+        <div ng-audio-recorder id='audioInput' audio-model='recordedInput'>
+            <div ng-if="recorder.isAvailable">
+                <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording">Start Record</button>
+                <button ng-click="recorder.stopRecord()" type="button" ng-disabled="!recorder.status.isRecording">Stop Record</button>
+                <button ng-click="recorder.save()" type="button" ng-disabled="recorder.status.isRecording || !recorder.audioModel">Download</button>
+            </div>
+            <div class="alert alert-danger" ng-if="!recorder.isAvailable">
+               THERE IS A PROBLEM HERE 
+            </div>
+        </div>
     </div>
     <script>
     var video = document.querySelector("#videoElement");
     var canvas = document.querySelector("#canvas");
     var button = document.querySelector("#button");
     var isValid = true;
-    var app = angular.module("myApp", ['ngFileUpload']);
-    app.controller("myCtrl", ['$scope', 'Upload', '$http', '$interval', function($scope, Upload, $http, $interval) {
-        $scope.Upload = Upload;
+    var app = angular.module("myApp", ['angularAudioRecorder'])
+        .config(['recorderServiceProvider', function(recorderServiceProvider){
+            
+        }]);
+    app.controller("myCtrl", ['$scope', '$http', '$interval', function($scope, $http, $interval) {
         $scope.$http = $http;
         $scope.$interval = $interval;
         navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
@@ -46,6 +58,7 @@
             });
 
         }
+
     }]);
 
     function handleVideo(stream) {

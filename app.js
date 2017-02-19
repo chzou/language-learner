@@ -9,6 +9,7 @@ var users = require('./routes/users');
 var submit = require('./routes/imagesubmit');
 var player = require('play-sound')(opts = {});
 var fs = require('fs');
+var recordAudio = require("record-audio");
 var app = express();
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
     // view engine setup

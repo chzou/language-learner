@@ -24,6 +24,7 @@
     "play-sound": "^1.1.1",
     "pug": "~2.0.0-beta10",
     "python-shell": "^0.4.0",
+    "record-audio": "^1.0.0",
     "serve-favicon": "~2.3.2"
   }
 }
