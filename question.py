@@ -7,8 +7,11 @@ import random
 
 if (__name__ == '__main__'):
     word = sys.argv[1]
-    adds = ["What are you doing with that " + word + "?", "Why is there that " + word + "?", "How do you feel about that " + word + "?"]
-    question = "That is a " + word + ". " + adds[random.randint(0,2)]
+    adds = ["What are you doing with that " + word + "?", "Why is there that " + word + "?", "How do you feel about that " + word + "?", "What color is that " + word + "?"]
+    index = random.randint(0,len(adds))
+    while (word == "Person" and index == 3):
+        index = random.randint(0,len(add))
+    question = "That is a " + word + ". " + adds[index]
 
     numf = open('questionnum.txt','r')
     fnum = int(numf.readline())
