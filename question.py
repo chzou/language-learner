@@ -3,10 +3,12 @@
 import os
 import sys
 import subprocess
+import random
 
 if (__name__ == '__main__'):
     word = sys.argv[1]
-    question = "That is a " + word + ". What are you doing with that " + word + "?"
+    adds = ["What are you doing with that " + word + "?", "Why is there that " + word + "?", "How do you feel about that " + word + "?"
+    question = "That is a " + word + ". " + adds[random.randint(0,2)]
 
     numf = open('questionnum.txt','r')
     fnum = int(numf.readline())
