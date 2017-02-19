@@ -15,12 +15,13 @@
     <div id="container" ng-app="myApp" ng-controller="myCtrl">
         <canvas id="canvas" style="display:none;" width="480" height="320"></canvas>
         <video autoplay="true" id="videoElement" width="100%" height="100%"></video>
-        <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</button>
+<!--        <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</button>
+-->
         <div ng-audio-recorder id='audioInput' audio-model='recordedInput'>
             <div ng-if="recorder.isAvailable">
                 <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording">Start Record</button>
                 <button ng-click="recorder.stopRecord()" type="button" ng-disabled="!recorder.status.isRecording">Stop Record</button>
-                <button ng-click="console.log(recordedInput)" type="button" ng-disabled="recorder.status.isRecording || !recorder.audioModel">Download</button
+                <button ng-click="console.log(recordedInput)" type="button" ng-disabled="recorder.status.isRecording || !recorder.audioModel">Download</button>
             </div>
             <div class="alert alert-danger" ng-if="!recorder.isAvailable">
                THERE IS A PROBLEM HERE 
@@ -78,6 +79,11 @@
             console.log('asdf');
             console.log($scope.recordedInput);
         }
+
+        $interval(function() {
+            $scope.handleSubmit();
+        }, 10000);
+
         $scope.handleSubmit = function() {
             canvas.getContext("2d").drawImage(video, 0, 0, 480, 320);
             var img = canvas.toDataURL("image/jpeg", .9);
@@ -93,7 +99,6 @@
                 audio.src = url;
                 audio.play();
             });
-
         }
 
     }]);
@@ -105,6 +110,7 @@
     function videoError(e) {
         // do something
     }
+
     </script>
 <style type="text/css">
 ::-webkit-scrollbar {
