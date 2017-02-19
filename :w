@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta content="Display Webcam Stream" name="title">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="https://www.rawgit.com/sathyapulse/angular-recorder/master/dist/angular-audio-recorder.min.js"></script>
+    <title>Display Webcam Stream</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div id="container" ng-app="myApp" ng-controller="myCtrl">
+        <canvas id="canvas" style="display:none;" width="480" height="320"></canvas>
+        <video autoplay="true" id="videoElement" width="100%" height="100%"></video>
+        <button id="button" type="button" name="Take Picture" ng-click="handleSubmit()">Button</input>
+        <ng-audio-recorder id='audioInput' audio-model='recordedInput'>
+            <button ng-click="recorder.startRecord()" type="button" ng-disabled="recorder.status.isRecording">Start Record</button>
+            <button ng-click="recorder.stopRecord()" type="button" ng-disabled="recorder.status.isRecording == false">Stop Record</button>
+        </ng-audio-recorder>
+    </div>
+    <script>
+    var video = document.querySelector("#videoElement");
+    var canvas = document.querySelector("#canvas");
+    var button = document.querySelector("#button");
+    var isValid = true;
+    var app = angular.module("myApp", ['angularAudioRecorder']);
+    app.controller("myCtrl", ['$scope', 'Upload', '$http', '$interval', 'ngAudioRecorderController', function($scope, Upload, $http, $interval, recorder) {
+        $scope.Upload = Upload;
+        $scope.$http = $http;
+        $scope.$interval = $interval;
+        $scope.recorder = recorder;
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.oGetUserMedia;
+
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia({
+                video: true
+            }, handleVideo, videoError);
+        }
+
+        $scope.handleSubmit = function() {
+            canvas.getContext("2d").drawImage(video, 0, 0, 480, 320);
+            var img = canvas.toDataURL("image/jpeg", .9);
+
+            $scope.$http.post('/submitimage', {
+                foo: img
+            }).success(function(res) {
+                console.log(res);
+            });
+
+        }
+
+    }]);
+
+    function handleVideo(stream) {
+        video.src = window.URL.createObjectURL(stream);
+    }
+
+    function videoError(e) {
+        // do something
+    }
+    </script>
+<style type="text/css">
+::-webkit-scrollbar {
+    display: none;
+}
+</style>
+</body>
+
+</html>
