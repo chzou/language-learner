@@ -102,6 +102,10 @@
                     $scope.$http.post('/submitaudio', {
                         foo: data
                     }).success(function(res) {
+                        if(res.done == "NOT DONE"){
+                            console.log("no audio");
+                            return;
+                        }
                         var convert = b64toBlob(res.data, "audio/wav");
                         var url = URL.createObjectURL(convert);
                         //console.log(url);
@@ -122,6 +126,10 @@
                 $scope.$http.post('/submitimage', {
                     foo: img
                 }).success(function(res) {
+                        if(res.done == "NOT DONE"){
+                            console.log("no audio or flg=1");
+                            return;
+                        }
                         console.log(res.data);
                         var convert = b64toBlob(res.data, "audio/wav");
                         var url = URL.createObjectURL(convert);

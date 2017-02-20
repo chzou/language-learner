@@ -42,9 +42,9 @@ app.use('/', index);
 app.use('/users', users);
 app.post('/submitimage', urlencodedParser, function(req, res) {
     if (flag == 1) {
-        res.end();
-        return;
-    }
+         res.send({done: "NOT DONE"});
+         return;
+     }
     var image = req.body.foo.replace(/^data:image\/jpeg;base64,/, "");
     var filePath = __dirname + "/imagefile.jpeg";
     fs.writeFile(filePath, image, "base64", function(err) {
